@@ -4,9 +4,7 @@
 1. Get Node Js v14.16.1 in your computer
 2. Create a `.env` file in the root of the project with this content:
 ````
-MONGO_USER=YOUR_MONGO_USER
-MONGO_PASS=YOUR_MONGO_PASSWORD
-MONGO_DB_NAME=YOUR_MONGO_DB_NAME
+MONGODB_ADDRESS=YOUR_MONGO_ADDRESS
 ````
 3. Install all needed libraries with the command `npm install`
 4. Run the project with the command `npm start`
