@@ -1,28 +1,29 @@
+require('dotenv/config');
 const expect = require('chai').expect;
 const mongoose = require('mongoose');
+const { v4 } = require('uuid');
 const constants = require('../constants');
-const { connect } = require('../connection');
+const { cakeSchema } = require('./Cake');
 
 describe('Cake Model', () => {
-    const Cake;
+    let Cake;
 
-    beforeEach((done) => {
-        connect();
-        mongoose.connection.once('connected', () => {
-            mongoose.connection.db.dropDatabase();
-            require('./Cake').registerModels();
-            Cake = mongoose.model('cake');
+    beforeAll((done) => {
+        mongoose.connect(process.env.MONGODB_ADDRESS).then(() => {
+            Cake = mongoose.model('cake', cakeSchema);
+            done();
+        }).catch((error) => {
+            console.log(error);
             done();
         });
-    });
+    }, 60000);
 
-    afterEach((done) => {
+    afterAll((done) => {
         mongoose.disconnect();
         done();
     });
 
-    describe('Lifecycle', () => {
-
+    describe('Validations', () => {
         it('should not save without name', (done) => {
             const cake = new Cake({
                 price: 12,
@@ -31,37 +32,23 @@ describe('Cake Model', () => {
             cake.save((err) => {
                 expect(err).to.exist
                     .and.be.instanceof(Error)
-                    .and.have.property('message', constants.MISSING_NAME_MESSAGE);
+                    .and.have.property('message', `cake validation failed: name: ${constants.MISSING_NAME_MESSAGE}`);
                 done();
             });
-        });
+        }, 60000);
 
         it('should not save without price', (done) => {
             const cake = new Cake({
-                name: 'test cake',
+                name: `test cake ${v4()}`,
                 flavors: ['chocolate']
             });
             cake.save((err) => {
                 expect(err).to.exist
                     .and.be.instanceof(Error)
-                    .and.have.property('message', constants.MISSING_PRICE_MESSAGE);
+                    .and.have.property('message', `cake validation failed: price: ${constants.MISSING_PRICE_MESSAGE}`);
                 done();
             });
-        });
-
-        it('should not save without flavors', (done) => {
-            const cake = new Cake({
-                price: 12,
-                name: 'test cake',
-            });
-            cake.save((err) => {
-                expect(err).to.exist
-                    .and.be.instanceof(Error)
-                    .and.have.property('message', constants.MISSING_FLAVORS_MESSAGE);
-                done();
-            });
-        });
-
+        }, 60000);
     });
 
 });

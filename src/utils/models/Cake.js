@@ -16,3 +16,5 @@ const cakeSchema = new Schema({
 });
 
 exports.Cake = mongoose.model('cake', cakeSchema);
+
+exports.cakeSchema = cakeSchema;
